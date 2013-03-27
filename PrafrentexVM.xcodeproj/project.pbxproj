@@ -1,0 +1,215 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		14847E6F170399F900C6A942 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 14847E6E170399F900C6A942 /* main.c */; };
+		14847E71170399F900C6A942 /* PrafrentexVM.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 14847E70170399F900C6A942 /* PrafrentexVM.1 */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		14847E68170399F900C6A942 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				14847E71170399F900C6A942 /* PrafrentexVM.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		14847E6A170399F900C6A942 /* PrafrentexVM */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PrafrentexVM; sourceTree = BUILT_PRODUCTS_DIR; };
+		14847E6E170399F900C6A942 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		14847E70170399F900C6A942 /* PrafrentexVM.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = PrafrentexVM.1; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		14847E67170399F900C6A942 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		14847E5F170399F900C6A942 = {
+			isa = PBXGroup;
+			children = (
+				14847E6D170399F900C6A942 /* PrafrentexVM */,
+				14847E6B170399F900C6A942 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		14847E6B170399F900C6A942 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				14847E6A170399F900C6A942 /* PrafrentexVM */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		14847E6D170399F900C6A942 /* PrafrentexVM */ = {
+			isa = PBXGroup;
+			children = (
+				14847E6E170399F900C6A942 /* main.c */,
+				14847E70170399F900C6A942 /* PrafrentexVM.1 */,
+			);
+			path = PrafrentexVM;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		14847E69170399F900C6A942 /* PrafrentexVM */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 14847E74170399F900C6A942 /* Build configuration list for PBXNativeTarget "PrafrentexVM" */;
+			buildPhases = (
+				14847E66170399F900C6A942 /* Sources */,
+				14847E67170399F900C6A942 /* Frameworks */,
+				14847E68170399F900C6A942 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PrafrentexVM;
+			productName = PrafrentexVM;
+			productReference = 14847E6A170399F900C6A942 /* PrafrentexVM */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		14847E61170399F900C6A942 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0450;
+				ORGANIZATIONNAME = "Café Artes Visuais";
+			};
+			buildConfigurationList = 14847E64170399F900C6A942 /* Build configuration list for PBXProject "PrafrentexVM" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 14847E5F170399F900C6A942;
+			productRefGroup = 14847E6B170399F900C6A942 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				14847E69170399F900C6A942 /* PrafrentexVM */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		14847E66170399F900C6A942 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				14847E6F170399F900C6A942 /* main.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		14847E72170399F900C6A942 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		14847E73170399F900C6A942 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		14847E75170399F900C6A942 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		14847E76170399F900C6A942 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		14847E64170399F900C6A942 /* Build configuration list for PBXProject "PrafrentexVM" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				14847E72170399F900C6A942 /* Debug */,
+				14847E73170399F900C6A942 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		14847E74170399F900C6A942 /* Build configuration list for PBXNativeTarget "PrafrentexVM" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				14847E75170399F900C6A942 /* Debug */,
+				14847E76170399F900C6A942 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 14847E61170399F900C6A942 /* Project object */;
+}
