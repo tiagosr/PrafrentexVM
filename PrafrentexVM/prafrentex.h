@@ -61,14 +61,19 @@ typedef union _atom {
     } flags;
 } t_atom;
 
+typedef struct _context t_context;
+
+typedef void(*t_word_native_code_ptr)(t_context *ctx, t_double_atom *code_ptr, void *data);
 typedef struct _word {
     t_atom atom;
-    
+    t_word_native_code_ptr code;
+    void *data;
 } t_word;
 
 typedef struct _user_word {
     t_atom atom;
-    
+    t_double_atom *code;
+    t_double_atom *closure;
 } t_user_word;
 
 typedef struct {
@@ -86,18 +91,22 @@ typedef union _atom_union {
     t_string string;
 } t_atom_union;
 
-typedef struct _context {
+struct _context {
     t_double_atom *stack;
     t_double_atom *stack_begin;
     t_double_atom *stack_end;
     t_double_atom *ret_stack;
     t_double_atom *ret_stack_begin;
     t_double_atom *ret_stack_end;
+    t_double_atom *closure_stack;
+    t_double_atom *closure_stack_begin;
+    t_double_atom *closure_stack_end;
+    
     int32_t *int_stack;
     int32_t *int_stack_begin;
     int32_t *int_stack_end;
     void *heap_base;
-} t_context;
+};
 
 t_context *pf_context_create();
 void pf_context_destroy(t_context *ctx);
