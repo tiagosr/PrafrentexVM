@@ -6,11 +6,11 @@
 //  Copyright (c) 2013 Café Artes Visuais. All rights reserved.
 //
 
-#include <stdio.h>
+#include "prafrentex.h"
 
 int main(int argc, const char * argv[])
 {
-
+    t_context *ctx = pf_context_create();
     // insert code here...
     printf("Hello, World!\n");
     return 0;
