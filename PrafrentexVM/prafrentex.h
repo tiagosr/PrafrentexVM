@@ -20,7 +20,9 @@
  * Prafrentex Virtual Machine is an experimental VM (and language?)
  * with likeness to Forth, but using doubles as numeric representation
  * and NaN-boxing (nun-boxing to be more correct, as we privilege
- * doubles over pointers) 
+ * doubles over pointers).
+ * It is also a direct-threaded VM, where each word is an address to either
+ * the code
  */
 
 
@@ -39,7 +41,7 @@ typedef union {
 } t_double_atom;
 
 // top bits masked off of a non-signalling NAN
-#define UPTR_MASK 0xfff8000000000000ul
+#define UPTR_MASK 0x7ff8000000000000ul
 
 enum AtomTypes {
     A_NULL = 0,
@@ -74,6 +76,7 @@ typedef struct _user_word {
     t_atom atom;
     t_double_atom *code;
     t_double_atom *closure;
+    t_double_atom *closure_begin, *closure_end;
 } t_user_word;
 
 typedef struct {
@@ -98,9 +101,6 @@ struct _context {
     t_double_atom *ret_stack;
     t_double_atom *ret_stack_begin;
     t_double_atom *ret_stack_end;
-    t_double_atom *closure_stack;
-    t_double_atom *closure_stack_begin;
-    t_double_atom *closure_stack_end;
     
     int32_t *int_stack;
     int32_t *int_stack_begin;
@@ -110,7 +110,10 @@ struct _context {
 
 t_context *pf_context_create();
 void pf_context_destroy(t_context *ctx);
-int pf_exec(t_context *ctx, t_double_atom *program);
+int pf_exec(t_context *ctx, t_double_atom *program,
+            t_double_atom *closure_stack,
+            t_double_atom *closure_stack_begin,
+            t_double_atom *closure_stack_end);
 
 t_double_atom pf_get_val(t_context *ctx, int index);
 

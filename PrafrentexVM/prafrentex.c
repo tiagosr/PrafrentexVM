@@ -30,7 +30,10 @@ void pf_context_destroy(t_context *ctx) {
     
 }
 
-int pf_exec(t_context *ctx, t_double_atom *code) {
+int pf_exec(t_context *ctx, t_double_atom *code,
+            t_double_atom *closure_stack,
+            t_double_atom *closure_stack_begin,
+            t_double_atom *closure_stack_end) {
     bool wasnull = false;
     if (ctx == NULL && code != NULL) {
         ctx = pf_context_create();
@@ -60,7 +63,16 @@ int pf_exec(t_context *ctx, t_double_atom *code) {
                         break;
                     case A_USER_WORD:
                         // TODO: execute PFVM word
-                        // push closure data onto stack, maybe?
+                    {
+                        int ret = pf_exec(ctx, atom->user_word.code,
+                                          atom->user_word.closure,
+                                          atom->user_word.closure_begin,
+                                          atom->user_word.closure_end);
+                        if (ret != 0) {
+                            return ret;
+                        }
+                        
+                    }
                         break;
                     case A_STRING:
                         // TODO: push constant string -- override constant flag from source?
@@ -79,4 +91,15 @@ int pf_exec(t_context *ctx, t_double_atom *code) {
     if (wasnull) {
         pf_context_destroy(ctx);
     }
+    return 0;
 }
+
+static void dup_op(t_context *ctx, t_double_atom *atom, void *data) {
+    ctx->stack--;
+    ctx->stack[0] = ctx->stack[1];
+}
+
+static void drop_op(t_context *ctx, t_double_atom *atom, void *data) {
+    ctx->stack++;
+}
+
