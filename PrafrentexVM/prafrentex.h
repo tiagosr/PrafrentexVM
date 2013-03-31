@@ -40,8 +40,11 @@ typedef union {
     } i32;
 } t_double_atom;
 
-// top bits masked off of a non-signalling NAN
+// top bits masked off of a non-signaling NaN
 #define UPTR_MASK 0x7ff8000000000000ul
+
+// quiet NaN negative mask
+#define QNAN_NEGMASK 0x0008000000000000ul
 
 enum AtomTypes {
     A_NULL = 0,
@@ -65,6 +68,12 @@ typedef union _atom {
 
 typedef struct _context t_context;
 
+typedef struct _stack {
+    t_double_atom *stack;
+    t_double_atom *stack_begin;
+    t_double_atom *stack_end;
+} t_stack;
+
 typedef void(*t_word_native_code_ptr)(t_context *ctx, t_double_atom *code_ptr, void *data);
 typedef struct _word {
     t_atom atom;
@@ -75,8 +84,7 @@ typedef struct _word {
 typedef struct _user_word {
     t_atom atom;
     t_double_atom *code;
-    t_double_atom *closure;
-    t_double_atom *closure_begin, *closure_end;
+    t_stack closure;
 } t_user_word;
 
 typedef struct {
@@ -85,7 +93,6 @@ typedef struct {
     size_t size;
     char *chars;
 } t_string;
-
 
 typedef union _atom_union {
     t_atom atom;
@@ -102,6 +109,8 @@ struct _context {
     t_double_atom *ret_stack_begin;
     t_double_atom *ret_stack_end;
     
+    t_double_atom *execptr;
+    
     int32_t *int_stack;
     int32_t *int_stack_begin;
     int32_t *int_stack_end;
@@ -110,10 +119,8 @@ struct _context {
 
 t_context *pf_context_create();
 void pf_context_destroy(t_context *ctx);
-int pf_exec(t_context *ctx, t_double_atom *program,
-            t_double_atom *closure_stack,
-            t_double_atom *closure_stack_begin,
-            t_double_atom *closure_stack_end);
+int pf_stack_create(t_stack *stack, size_t stack_size);
+int pf_exec(t_context *ctx, t_double_atom *program, t_stack *closure_stack);
 
 t_double_atom pf_get_val(t_context *ctx, int index);
 

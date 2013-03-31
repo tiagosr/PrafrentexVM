@@ -12,6 +12,15 @@
 static size_t init_stack_sz = 4096, init_ret_stack_sz = 256;
 static size_t init_int_stack_sz = 4096;
 
+int pf_stack_create(t_stack *stack, size_t stack_size) {
+    stack->stack_end = calloc(sizeof(t_double_atom)*stack_size, 0);
+    stack->stack_begin = stack->stack = stack->stack_end+stack_size;
+    if (stack->stack_end) {
+        return 1;
+    }
+    return 0;
+}
+
 t_context* pf_context_create() {
     t_context *ctx = malloc(sizeof(t_context));
     
@@ -30,26 +39,23 @@ void pf_context_destroy(t_context *ctx) {
     
 }
 
-int pf_exec(t_context *ctx, t_double_atom *code,
-            t_double_atom *closure_stack,
-            t_double_atom *closure_stack_begin,
-            t_double_atom *closure_stack_end) {
+int pf_exec(t_context *ctx, t_double_atom *code, t_stack *closure) {
     bool wasnull = false;
     if (ctx == NULL && code != NULL) {
         ctx = pf_context_create();
         wasnull = true;
     }
     
-    t_double_atom *execptr = code;
+    ctx->execptr = code;
     while (true) {
-        if (execptr[0].d != execptr[0].d) {
+        if (ctx->execptr[0].d != ctx->execptr[0].d) {
             // the test above is the same as isnan(execptr[0].d) but looks less
             // likely to translate to a function - even though the compiler might.
             
-            uint64_t u64 = execptr[0].u64 - UPTR_MASK; // clear the NANQ bits, still 50-odd bits left for us
+            uint64_t u64 = ctx->execptr[0].u64 - UPTR_MASK; // clear the NANQ bits, still 50-odd bits left for us
             if (u64&1) {
                 // it's an integer push - 31bits. TODO: deal with endianess
-                int32_t i = execptr[0].i32._1>>1;
+                int32_t i = ctx->execptr[0].i32._1>>1;
                 (--ctx->int_stack)[0] = i;
             } else {
                 uintptr_t uptr = u64>>1;
@@ -62,16 +68,11 @@ int pf_exec(t_context *ctx, t_double_atom *code,
                         // TODO: execute native word
                         break;
                     case A_USER_WORD:
-                        // TODO: execute PFVM word
                     {
-                        int ret = pf_exec(ctx, atom->user_word.code,
-                                          atom->user_word.closure,
-                                          atom->user_word.closure_begin,
-                                          atom->user_word.closure_end);
+                        int ret = pf_exec(ctx, atom->user_word.code, &atom->user_word.closure);
                         if (ret != 0) {
                             return ret;
                         }
-                        
                     }
                         break;
                     case A_STRING:
@@ -83,9 +84,9 @@ int pf_exec(t_context *ctx, t_double_atom *code,
             }
         } else {
             // push double constant to stack.
-            (--ctx->stack)[0] = execptr[0];
+            (--ctx->stack)[0] = ctx->execptr[0];
         }
-        execptr++;
+        ctx->execptr++;
     }
     
     if (wasnull) {
@@ -94,12 +95,63 @@ int pf_exec(t_context *ctx, t_double_atom *code,
     return 0;
 }
 
+//// STACK MANIPULATION
+
+// dup: (... d1 d0 => ... d1 d0 d0)
 static void dup_op(t_context *ctx, t_double_atom *atom, void *data) {
     ctx->stack--;
     ctx->stack[0] = ctx->stack[1];
 }
 
+// dup: (... d1 d0 => ... d1)
 static void drop_op(t_context *ctx, t_double_atom *atom, void *data) {
+    if (ctx->stack[0].d != ctx->stack[0].d) {
+        // test if it's actually a quiet NaN.
+        if (!(ctx->stack[0].u64 & QNAN_NEGMASK)) {
+            // right now I don't know if this test is enough
+            // anyways, just zero it out, GC will care for the rest.
+            ctx->stack[0].d = 0;
+        } // else just drop
+    }
     ctx->stack++;
+}
+
+
+
+//// INT-INDEXED STACK MANIPULATION
+
+// pick: (dn ... d0, ... i1 i0 => dn ... d0 dn, ... i1)
+static void pick_op(t_context *ctx, t_double_atom *atom, void *data) {
+    int i = ctx->int_stack[0];
+    ctx->int_stack++; // pop int
+    t_double_atom a = ctx->stack[i];
+    ctx->stack--;
+    ctx->stack[0] = a;
+}
+
+
+//// INTEGER STACK MANIPULATION
+
+// idup: (... i1 i0 => ... i1 i0 i0)
+static void idup_op(t_context *ctx, t_double_atom *atom, void *data) {
+    ctx->int_stack--;
+    ctx->int_stack[0] = ctx->int_stack[1];
+}
+
+// idrop: (... i1 i0 => ... i1)
+static void idrop_op(t_context *ctx, t_double_atom *atom, void *data) {
+    ctx->int_stack++;
+}
+
+// iadd: (... i1 i0 => ... i1 i0 i1+i0)
+static void iadd_op(t_context *ctx, t_double_atom *atom, void *data) {
+    ctx->int_stack--;
+    ctx->int_stack[0] = ctx->int_stack[1]+ctx->int_stack[2];
+}
+
+// isub: (... i1 i0 => ... i1 i0 i1-i0)
+static void isub_op(t_context *ctx, t_double_atom *atom, void *data) {
+    ctx->int_stack--;
+    ctx->int_stack[0] = ctx->int_stack[2]-ctx->int_stack[1];
 }
 
