@@ -36,7 +36,9 @@ t_context* pf_context_create() {
 }
 
 void pf_context_destroy(t_context *ctx) {
-    
+    free(ctx->int_stack_end);
+    free(ctx->ret_stack_end);
+    free(ctx->stack_end);
 }
 
 int pf_exec(t_context *ctx, t_double_atom *code, t_stack *closure) {
@@ -62,10 +64,12 @@ int pf_exec(t_context *ctx, t_double_atom *code, t_stack *closure) {
                 t_atom_union *atom = (t_atom_union*)uptr;
                 switch (atom->atom.flags.type) {
                     case A_NULL:
-                        // TODO: store null object into stack
+                        // TODO: push null object into stack
                         break;
                     case A_WORD:
-                        // TODO: execute native word
+                    {
+                        atom->word.code(ctx, ctx->execptr, atom->word.data);
+                    }
                         break;
                     case A_USER_WORD:
                     {
@@ -93,6 +97,17 @@ int pf_exec(t_context *ctx, t_double_atom *code, t_stack *closure) {
         pf_context_destroy(ctx);
     }
     return 0;
+}
+
+t_double_atom pf_make_double_for_atom(t_atom *atom) {
+    t_double_atom da;
+    da.u64 = ((uint64_t)((uintptr_t)atom))+UPTR_MASK;
+    return da;
+}
+
+
+t_atom *pf_unref_double(t_double_atom d) {
+    return (t_atom *)(d.u64-UPTR_MASK);
 }
 
 //// STACK MANIPULATION

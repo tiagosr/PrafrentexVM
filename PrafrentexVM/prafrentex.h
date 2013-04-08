@@ -122,6 +122,9 @@ void pf_context_destroy(t_context *ctx);
 int pf_stack_create(t_stack *stack, size_t stack_size);
 int pf_exec(t_context *ctx, t_double_atom *program, t_stack *closure_stack);
 
+t_double_atom pf_make_double_for_atom(t_atom *atom);
+t_atom *pf_unref_double(t_double_atom d);
+
 t_double_atom pf_get_val(t_context *ctx, int index);
 
 #endif
