@@ -131,6 +131,21 @@ static void drop_op(t_context *ctx, t_double_atom *atom, void *data) {
     ctx->stack++;
 }
 
+// swap: (... d1 d0 => ... d0 d1)
+static void swap_op(t_context *ctx, t_double_atom *atom, void *data) {
+    t_double_atom temp = ctx->stack[0];
+    ctx->stack[0] = ctx->stack[1];
+    ctx->stack[1] = temp;
+}
+
+// rot: (... d2 d1 d0 => ... d1 d0 d2)
+static void rot_op(t_context *ctx, t_double_atom *atom, void *data) {
+    t_double_atom temp = ctx->stack[2];
+    ctx->stack[2] = ctx->stack[1];
+    ctx->stack[1] = ctx->stack[0];
+    ctx->stack[0] = temp;
+}
+
 
 
 //// INT-INDEXED STACK MANIPULATION
@@ -142,6 +157,44 @@ static void pick_op(t_context *ctx, t_double_atom *atom, void *data) {
     t_double_atom a = ctx->stack[i];
     ctx->stack--;
     ctx->stack[0] = a;
+}
+
+// depth: (dn ... d0, ... i0 => dn ... d0, ... i0 n)
+static void depth_op(t_context *ctx, t_double_atom *atom, void *data) {
+    off_t offset = (((void *)ctx->stack_end) - ((void *)ctx->stack))/sizeof(t_double_atom);
+    ctx->int_stack--;
+    ctx->int_stack[0] = (int)offset;
+}
+
+
+//// DOUBLE STACK MANIPULATION
+
+// add: (... d1 d0 => ... d1+d0)
+static void add_op(t_context *ctx, t_double_atom *atom, void *data) {
+    ctx->stack[1].d = ctx->stack[1].d + ctx->stack[0].d;
+    ctx->stack[0].d = 0;
+    ctx->stack++;
+}
+
+// sub: (... d1 d0 => ... d1-d0)
+static void sub_op(t_context *ctx, t_double_atom *atom, void *data) {
+    ctx->stack[1].d = ctx->stack[1].d - ctx->stack[0].d;
+    ctx->stack[0].d = 0;
+    ctx->stack++;
+}
+
+// mul: (... d1 d0 => ... d1*d0)
+static void mul_op(t_context *ctx, t_double_atom *atom, void *data) {
+    ctx->stack[1].d = ctx->stack[1].d * ctx->stack[0].d;
+    ctx->stack[0].d = 0;
+    ctx->stack++;
+}
+
+// div: (... d1 d0 => ... d1/d0)
+static void div_op(t_context *ctx, t_double_atom *atom, void *data) {
+    ctx->stack[1].d = ctx->stack[1].d / ctx->stack[0].d;
+    ctx->stack[0].d = 0;
+    ctx->stack++;
 }
 
 
@@ -158,15 +211,35 @@ static void idrop_op(t_context *ctx, t_double_atom *atom, void *data) {
     ctx->int_stack++;
 }
 
-// iadd: (... i1 i0 => ... i1 i0 i1+i0)
+// iswap: (... i1 i0 => ... i0 i1)
+static void iswap_op(t_context *ctx, t_double_atom *atom, void *data) {
+    int temp = ctx->int_stack[0];
+    ctx->int_stack[0] = ctx->int_stack[1];
+    ctx->int_stack[1] = temp;
+}
+
+// iadd: (... i1 i0 => ... i1+i0)
 static void iadd_op(t_context *ctx, t_double_atom *atom, void *data) {
-    ctx->int_stack--;
-    ctx->int_stack[0] = ctx->int_stack[1]+ctx->int_stack[2];
+    ctx->int_stack[1] = ctx->int_stack[0]+ctx->int_stack[1];
+    ctx->int_stack++;
 }
 
-// isub: (... i1 i0 => ... i1 i0 i1-i0)
+// isub: (... i1 i0 => ... i1-i0)
 static void isub_op(t_context *ctx, t_double_atom *atom, void *data) {
-    ctx->int_stack--;
-    ctx->int_stack[0] = ctx->int_stack[2]-ctx->int_stack[1];
+    ctx->int_stack[1] = ctx->int_stack[1]-ctx->int_stack[0];
+    ctx->int_stack++;
 }
 
+// d>i: (... d1 d0, ... i0 => ... d1, ... i0 (int)d0)
+static void d_to_i_op(t_context *ctx, t_double_atom *atom, void *data) {
+    ctx->int_stack--;
+    ctx->int_stack[0] = ctx->stack[0].d;
+    ctx->stack++;
+}
+
+// i>d: (... d0, ... i1 i0 => ... d0 (double)i0, ... i1)
+static void i_to_d_op(t_context *ctx, t_double_atom *atom, void *data) {
+    ctx->stack--;
+    ctx->stack[0].d = ctx->int_stack[0];
+    ctx->int_stack++;
+}
