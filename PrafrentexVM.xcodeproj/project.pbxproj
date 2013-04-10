@@ -26,6 +26,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		14298C071715B7430003DEB2 /* utarray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utarray.h; sourceTree = "<group>"; };
+		14298C081715B7430003DEB2 /* uthash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = uthash.h; sourceTree = "<group>"; };
+		14298C091715B7430003DEB2 /* utlist.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utlist.h; sourceTree = "<group>"; };
+		14298C0A1715B7430003DEB2 /* utstring.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utstring.h; sourceTree = "<group>"; };
 		14847E6A170399F900C6A942 /* PrafrentexVM */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PrafrentexVM; sourceTree = BUILT_PRODUCTS_DIR; };
 		14847E6E170399F900C6A942 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		14847E70170399F900C6A942 /* PrafrentexVM.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = PrafrentexVM.1; sourceTree = "<group>"; };
@@ -63,6 +67,10 @@
 		14847E6D170399F900C6A942 /* PrafrentexVM */ = {
 			isa = PBXGroup;
 			children = (
+				14298C071715B7430003DEB2 /* utarray.h */,
+				14298C081715B7430003DEB2 /* uthash.h */,
+				14298C091715B7430003DEB2 /* utlist.h */,
+				14298C0A1715B7430003DEB2 /* utstring.h */,
 				14847E6E170399F900C6A942 /* main.c */,
 				14847E7717039A1100C6A942 /* prafrentex.h */,
 				148C748A17049B64006C1757 /* prafrentex.c */,

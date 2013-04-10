@@ -7,17 +7,28 @@
 //
 
 #include <stdlib.h>
+#include <string.h>
 #include "prafrentex.h"
+
 
 static size_t init_stack_sz = 4096, init_ret_stack_sz = 256;
 static size_t init_int_stack_sz = 4096;
 
+static t_atom null_atom_st = {
+    .flags = {
+        .gc_flags = 3,
+        .type = A_NULL
+    }
+};
+t_atom *null_atom = &null_atom_st;
+t_double_atom null_atom_d = {
+    .u64 = ((uintptr_t)&null_atom_st)+PF_PTR_MASK,
+};
+
 int pf_stack_create(t_stack *stack, size_t stack_size) {
     stack->stack_end = calloc(sizeof(t_double_atom)*stack_size, 0);
     stack->stack_begin = stack->stack = stack->stack_end+stack_size;
-    if (stack->stack_end) {
-        return 1;
-    }
+    if (stack->stack_end) { return 1; }
     return 0;
 }
 
@@ -32,6 +43,10 @@ t_context* pf_context_create() {
     
     ctx->int_stack = calloc(sizeof(int32_t)*init_int_stack_sz, 0);
     ctx->int_stack_begin = ctx->int_stack = ctx->int_stack_end+init_int_stack_sz;
+    
+    ctx->dictionary = NULL;
+    
+    
     return ctx;
 }
 
@@ -54,7 +69,7 @@ int pf_exec(t_context *ctx, t_double_atom *code, t_stack *closure) {
             // the test above is the same as isnan(execptr[0].d) but looks less
             // likely to translate to a function - even though the compiler might.
             
-            uint64_t u64 = ctx->execptr[0].u64 - UPTR_MASK; // clear the NANQ bits, still 50-odd bits left for us
+            uint64_t u64 = ctx->execptr[0].u64 - PF_PTR_MASK; // clear the NANQ bits, still 50-odd bits left for us
             if (u64&1) {
                 // it's an integer push - 31bits. TODO: deal with endianess
                 int32_t i = ctx->execptr[0].i32._1>>1;
@@ -99,15 +114,81 @@ int pf_exec(t_context *ctx, t_double_atom *code, t_stack *closure) {
     return 0;
 }
 
+t_double_atom pf_find_word(t_context *ctx, const char* name) {
+    t_double_atom a;
+    double d = strtod(name, NULL);
+    if (d == d) {
+        a.d = d;
+    } else {
+        if (strcmp(name, "inf")==0) {
+            a.d = 0.0/0.0;
+        } else if (strcmp(name, "+inf")==0) {
+            a.d = 1.0/0.0;
+        } else if (strcmp(name, "-inf")==0) {
+            a.d = -1.0/0.0;
+        } else if (strcmp(name, "nan")==0) {
+            a.d = nan(0);
+        } else if(strcmp(name, "qnan")==0) {
+            a.d = NAN;
+        } else if(strcmp(name, "null")==0) {
+            return null_atom_d;
+        } else {
+            unsigned i = 0;
+            if (sscanf(name, "#%u", &i)==1) {
+                a = PF_MAKE_INT_DOUBLE(i);
+            } else if(sscanf(name, "0x%X", &i)==1) {
+                a = PF_MAKE_INT_DOUBLE(i);
+            } else if (sscanf(name, "-#%u", &i)==1) {
+                a = PF_MAKE_INT_DOUBLE(-i);
+            } else if(sscanf(name, "-0x%X", &i)==1) {
+                a = PF_MAKE_INT_DOUBLE(-i);
+            } else {
+                t_dictionary_entry *entry = NULL;
+                HASH_FIND_STR(ctx->dictionary, name, entry);
+                if(!entry) {
+                    
+                } else {
+                    a = pf_make_double_for_atom(entry->atom);
+                }
+            }
+        }
+    }
+    return a;
+}
+
+void pf_add_word(t_context *ctx, const char *name, t_atom *atom) {
+    t_dictionary_entry *entry = NULL;
+    t_dictionary_entry *new_entry = malloc(sizeof(t_dictionary_entry));
+    new_entry->atom = atom;
+    new_entry->name = strdup(name);
+    HASH_FIND_STR(ctx->dictionary, name, entry);
+    new_entry->next = entry; // valid ptr if found, null otherwise
+    if (entry) {
+        HASH_DEL(ctx->dictionary, entry);
+    }
+    HASH_ADD_STR(ctx->dictionary, name, new_entry);
+}
+
+void pf_forget_word(t_context *ctx, const char *name) {
+    t_dictionary_entry *entry = NULL;
+    HASH_FIND_STR(ctx->dictionary, name, entry);
+    HASH_DEL(ctx->dictionary, entry);
+    if (entry->next) {
+        HASH_ADD_STR(ctx->dictionary, name, entry->next);
+    }
+    free(entry->name);
+    free(entry);
+}
+
 t_double_atom pf_make_double_for_atom(t_atom *atom) {
     t_double_atom da;
-    da.u64 = ((uint64_t)((uintptr_t)atom))+UPTR_MASK;
+    da.u64 = ((uint64_t)((uintptr_t)atom))+PF_PTR_MASK;
     return da;
 }
 
 
 t_atom *pf_unref_double(t_double_atom d) {
-    return (t_atom *)(d.u64-UPTR_MASK);
+    return (t_atom *)(d.u64-PF_PTR_MASK);
 }
 
 //// STACK MANIPULATION
